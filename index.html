@@ -144,6 +144,11 @@ button { font: inherit; cursor: pointer; }
 .field input, .field textarea { font: inherit; font-weight: 400; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; }
 .field textarea { resize: vertical; min-height: 70px; }
 .fine { font-size: 12px; color: var(--muted); }
+.money-input { display: flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding-left: 12px; font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+.money-input input { border: 0; background: transparent; padding-left: 0; font-family: var(--font-display); font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; }
+.money-input:focus-within { outline: 3px solid var(--exit); outline-offset: 2px; }
+.money-input input:focus-visible { outline: none; }
+.form-error { margin: 0; color: var(--brake); font-size: 14px; font-weight: 600; }
 .dialog-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
 .thanks { text-align: center; display: grid; gap: 12px; justify-items: center; }
 .thanks svg { width: 72px; height: 72px; }
@@ -376,20 +381,23 @@ button { font: inherit; cursor: pointer; }
     <form id="donate-form">
       <div style="display:grid;gap:16px">
         <h2 id="dlg-title">Chip in for the glove</h2>
-        <p>Pick an amount. Leave a message for the helicopter.</p>
-        <div class="amounts" role="group" aria-label="Amount">
+        <p>This is like a joke, man, no real money is at stake. But feel free to vent in the comment.</p>
+        <div class="amounts" role="group" aria-label="Quick amounts">
           <button type="button" data-amt="10" aria-pressed="false">$10</button>
           <button type="button" data-amt="25" aria-pressed="true">$25</button>
           <button type="button" data-amt="50" aria-pressed="false">$50</button>
           <button type="button" data-amt="100" aria-pressed="false">$100</button>
         </div>
+        <label class="field" for="d-amount">Fake amount
+          <span class="money-input"><span aria-hidden="true">$</span><input id="d-amount" type="number" inputmode="numeric" min="1" max="1000000" step="1" value="25" required></span>
+        </label>
         <label class="field" for="d-name">Name on the donor list
           <input id="d-name" type="text" maxlength="40" placeholder="Anonymous">
         </label>
-        <label class="field" for="d-msg">Message
-          <textarea id="d-msg" maxlength="140" placeholder="The white Tacoma. Every day. You know who you are."></textarea>
+        <label class="field" for="d-msg">Comment
+          <textarea id="d-msg" maxlength="280" placeholder="The white Tacoma. Every day. You know who you are."></textarea>
         </label>
-        <p class="fine">This is a joke. Nothing is charged and nothing leaves your browser.</p>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
         <div class="dialog-actions">
           <button class="btn btn-ghost" type="button" id="cancel">Cancel</button>
           <button class="btn btn-primary" type="submit">Donate $25</button>
@@ -399,7 +407,7 @@ button { font: inherit; cursor: pointer; }
     <div class="thanks" id="thanks" hidden>
       <svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="var(--sign)"/><path d="M22 37 l9 9 l19 -20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <h2>Your disapproval has been logged</h2>
-      <p>No money changed hands. Your name is on the list until you close this tab.</p>
+      <p>No money changed hands. Your name and comment are up on the list for everyone to see.</p>
       <button class="btn btn-primary" type="button" id="done">Back to the campaign</button>
     </div>
   </div>
@@ -408,9 +416,13 @@ button { font: inherit; cursor: pointer; }
 <script>
 (function () {
   var GOAL = 41800;
-  var raised = 3217;
-  var count = 87;
-  var amount = 25;
+  // Shared donor wall lives in Supabase (table: fake_donations). The anon key is public by design; row-level security limits it to reading and adding rows.
+  var SB_URL = "https://cwhezeoyuxgtdentjxha.supabase.co";
+  var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3aGV6ZW95dXhndGRlbnRqeGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjA0OTYsImV4cCI6MjA5MTY5NjQ5Nn0.pY8EiOdAX4NKFkuwfD3Sw7wmcP-AEuo9rHNA_KXQ3pA";
+  var SB_HEADERS = { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY };
+  // Baseline before the wall went live, plus the donors below.
+  var BASE_RAISED = 3217, BASE_COUNT = 87;
+  var raised = BASE_RAISED, count = BASE_COUNT;
 
   var thumb = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 21c1 0 1.6-.8 1.6-1.8V15h5.2c1.2 0 2.1-1.1 1.9-2.3l-1-6.4C17.5 5 16.6 4 15.4 4H8v10.4l1.4 5.3c.1.7.4 1.3.6 1.3zM3 4h3v10H3z" fill="currentColor"/></svg>';
 
@@ -425,9 +437,8 @@ button { font: inherit; cursor: pointer; }
 
   var list = document.getElementById("donors");
   function money(n) { return "$" + n.toLocaleString("en-US"); }
-  function addDonor(name, amt, msg, isNew) {
+  function donorItem(name, amt, msg) {
     var li = document.createElement("li");
-    if (isNew) li.className = "new";
     var dot = document.createElement("div"); dot.className = "dot"; dot.innerHTML = thumb;
     var body = document.createElement("div");
     var who = document.createElement("span"); who.className = "who"; who.textContent = name;
@@ -435,24 +446,47 @@ button { font: inherit; cursor: pointer; }
     body.appendChild(who); body.appendChild(amtEl);
     if (msg) { var q = document.createElement("q"); q.textContent = msg; body.appendChild(q); }
     li.appendChild(dot); li.appendChild(body);
-    list.insertBefore(li, isNew ? list.firstChild : null);
+    return li;
   }
-  seed.forEach(function (d) { addDonor(d[0], d[1], d[2], false); });
+  // The shared donations go above the original donors; newest first.
+  var seedStart = null;
+  seed.forEach(function (d) { var li = donorItem(d[0], d[1], d[2]); if (!seedStart) seedStart = li; list.appendChild(li); });
+  function addShared(row, isNew) {
+    var li = donorItem(row.name || "Anonymous", row.amount, row.message);
+    if (isNew) { li.className = "new"; list.insertBefore(li, list.firstChild); }
+    else list.insertBefore(li, seedStart);
+  }
 
   function render() {
     document.getElementById("raised").textContent = money(raised);
-    document.getElementById("count").textContent = count;
+    document.getElementById("count").textContent = count.toLocaleString("en-US");
     document.getElementById("bar").setAttribute("aria-valuenow", raised);
     document.getElementById("bar-fill").style.width = Math.min(100, raised / GOAL * 100).toFixed(1) + "%";
   }
+
+  fetch(SB_URL + "/rest/v1/fake_donations?select=name,amount,message&order=created_at.desc&limit=2000", { headers: SB_HEADERS })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (rows) {
+      rows.forEach(function (row) { raised += row.amount; count += 1; });
+      rows.slice(0, 40).forEach(function (row) { addShared(row, false); });
+      render();
+    })
+    .catch(function () { /* Wall unavailable: the page still shows the original donors. */ });
 
   var overlay = document.getElementById("overlay");
   var form = document.getElementById("donate-form");
   var thanks = document.getElementById("thanks");
   var submitBtn = form.querySelector('button[type="submit"]');
   var amtBtns = form.querySelectorAll(".amounts button");
+  var amtInput = document.getElementById("d-amount");
+  var errorEl = document.getElementById("form-error");
 
-  function open() { form.hidden = false; thanks.hidden = true; overlay.hidden = false; amtBtns[1].focus(); }
+  function syncButtons() {
+    var v = Math.floor(Number(amtInput.value));
+    amtBtns.forEach(function (x) { x.setAttribute("aria-pressed", String(Number(x.dataset.amt) === v)); });
+    submitBtn.textContent = v >= 1 ? "Donate $" + v.toLocaleString("en-US") : "Donate";
+  }
+  function open() { form.hidden = false; thanks.hidden = true; errorEl.hidden = true; overlay.hidden = false; amtInput.focus(); amtInput.select(); }
   function close() { overlay.hidden = true; document.getElementById("open-donate").focus(); }
 
   document.getElementById("open-donate").addEventListener("click", open);
@@ -462,24 +496,40 @@ button { font: inherit; cursor: pointer; }
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !overlay.hidden) close(); });
 
   amtBtns.forEach(function (b) {
-    b.addEventListener("click", function () {
-      amtBtns.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
-      b.setAttribute("aria-pressed", "true");
-      amount = Number(b.dataset.amt);
-      submitBtn.textContent = "Donate $" + amount;
-    });
+    b.addEventListener("click", function () { amtInput.value = b.dataset.amt; syncButtons(); });
   });
+  amtInput.addEventListener("input", syncButtons);
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    var name = document.getElementById("d-name").value.trim() || "Anonymous";
-    var msg = document.getElementById("d-msg").value.trim();
-    raised += amount; count += 1;
-    addDonor(name, amount, msg, true);
-    render();
-    form.reset();
-    form.hidden = true; thanks.hidden = false;
-    document.getElementById("done").focus();
+    var amt = Math.floor(Number(amtInput.value));
+    if (!(amt >= 1 && amt <= 1000000)) { errorEl.textContent = "Enter a fake amount between $1 and $1,000,000."; errorEl.hidden = false; return; }
+    var row = {
+      name: document.getElementById("d-name").value.trim().slice(0, 40) || "Anonymous",
+      amount: amt,
+      message: document.getElementById("d-msg").value.trim().slice(0, 280)
+    };
+    submitBtn.disabled = true; submitBtn.textContent = "Sending…"; errorEl.hidden = true;
+    fetch(SB_URL + "/rest/v1/fake_donations", {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json", Prefer: "return=minimal" }, SB_HEADERS),
+      body: JSON.stringify(row)
+    })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); })
+      .then(function () {
+        raised += amt; count += 1;
+        addShared(row, true);
+        render();
+        form.reset(); amtInput.value = 25; syncButtons();
+        form.hidden = true; thanks.hidden = false;
+        document.getElementById("done").focus();
+      })
+      .catch(function () {
+        errorEl.textContent = "The donation didn't go through. Check your connection and try again.";
+        errorEl.hidden = false;
+        syncButtons();
+      })
+      .then(function () { submitBtn.disabled = false; });
   });
 
   document.getElementById("share").addEventListener("click", function () {
