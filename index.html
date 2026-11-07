@@ -148,36 +148,15 @@ button { font: inherit; cursor: pointer; }
 @keyframes pump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(26px); } }
 .cable { animation: cable 0.9s ease-in-out infinite; }
 @keyframes cable { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.37); } }
-.cutter { animation: cut 9s ease-in-out infinite; }
-@keyframes cut {
-  0% { transform: translate(-90px, 358px); }
-  50% { transform: translate(470px, 358px); }
-  62% { transform: translate(535px, 413px); }
-  100% { transform: translate(535px, 413px); }
-}
-.beam { transform-box: view-box; transform-origin: 400px 150px; animation: beam 9s ease-in-out infinite; }
-@keyframes beam {
-  0%, 52% { opacity: 0; transform: rotate(-12deg); }
-  58% { opacity: 1; transform: rotate(-22deg); }
-  64%, 94% { opacity: 1; transform: rotate(-28.5deg); }
-  100% { opacity: 0; transform: rotate(-28.5deg); }
-}
-.deploy { animation: deploy 9s ease-in-out infinite; }
-@keyframes deploy {
-  0%, 60% { opacity: 0; transform: translateY(-70px); }
-  61% { opacity: 1; transform: translateY(-70px); }
-  67%, 92% { opacity: 1; transform: translateY(0); }
-  97% { opacity: 1; transform: translateY(-70px); }
-  98%, 100% { opacity: 0; transform: translateY(-70px); }
-}
-.shout { animation: shout 9s steps(1) infinite; }
-@keyframes shout { 0%, 63% { opacity: 0; } 64%, 95% { opacity: 1; } 100% { opacity: 0; } }
+.beam { opacity: 0; transition: opacity 0.25s ease; }
+.shaming .beam { opacity: 1; }
+.shout { opacity: 0; transition: opacity 0.1s; }
+.shaming .shout { opacity: 1; }
+.deploy { opacity: 0; transform: translateY(-70px); transition: transform 0.6s ease, opacity 0.2s ease 0.5s; }
+.shaming .deploy { opacity: 1; transform: translateY(0); transition: transform 0.6s ease, opacity 0.1s; }
 @media (prefers-reduced-motion: reduce) {
   .rotor, .heli, .glove, .cable { animation: none; }
-  .cutter { animation: none; transform: translate(535px, 413px); }
-  .beam { animation: none; opacity: 1; transform: rotate(-28.5deg); }
-  .shout { animation: none; opacity: 1; }
-  .deploy { animation: none; }
+  .beam, .shout, .deploy { transition: none; }
   .bar span { transition: none; }
 }
 </style>
@@ -199,8 +178,8 @@ button { font: inherit; cursor: pointer; }
 
   <div class="grid">
     <div class="main-col">
-      <div class="hero" role="img" aria-label="Cartoon: a helicopter at dusk hovers over a highway. A car speeds up the empty middle lane and cuts into the stopped exit-only queue for 495 South. A spotlight snaps onto it and a giant white glove hanging from the helicopter pumps a thumbs down.">
-        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <div class="hero" role="img" aria-label="Cartoon: a helicopter at dusk hovers over a highway. A car speeds up the empty middle lane and cuts into a gap in the slow-moving exit-only line for 495 South. A spotlight snaps onto it and a giant white glove hanging from the helicopter pumps a thumbs down.">
+        <svg id="scene" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <defs>
             <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#1e2a55"/>
@@ -227,27 +206,9 @@ button { font: inherit; cursor: pointer; }
           <rect y="394" width="800" height="5" fill="#f2f2f2"/>
           <rect y="445" width="800" height="3" fill="#f2f2f2"/>
 
-          <!-- left-lane traffic, also stopped -->
-          <g>
-            <g transform="translate(60 300)"><rect width="52" height="28" rx="7" fill="#8a96a3"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(250 300)"><rect width="52" height="28" rx="7" fill="#d9d4c7"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(640 300)"><rect width="52" height="28" rx="7" fill="#5c6b7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-          </g>
-
-          <!-- exit-only queue: the honest people -->
-          <g>
-            <g transform="translate(15 408)"><rect width="52" height="28" rx="7" fill="#b03a2e"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(82 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(149 408)"><rect width="52" height="28" rx="7" fill="#2f4e7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(216 408)"><rect width="52" height="28" rx="7" fill="#9aa3ad"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(283 408)"><rect width="52" height="28" rx="7" fill="#3d5c3a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(350 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(417 408)"><rect width="52" height="28" rx="7" fill="#1d1f22"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#4a535c"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(484 408)"><rect width="52" height="28" rx="7" fill="#c9b27a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(605 408)"><rect width="52" height="28" rx="7" fill="#7b2d26"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(672 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-            <g transform="translate(739 408)"><rect width="52" height="28" rx="7" fill="#2f4e7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
-          </g>
+          <!-- left lane moves at speed; exit-only lane crawls. Filled in by the script below. -->
+          <g id="lane-left"></g>
+          <g id="lane-exit"></g>
 
           <!-- overhead sign -->
           <g>
@@ -264,15 +225,15 @@ button { font: inherit; cursor: pointer; }
           </g>
 
           <!-- the cutter -->
-          <g class="cutter">
+          <g id="cutter" transform="translate(-200 358)">
             <rect width="52" height="28" rx="7" fill="#3fd0c9"/>
             <rect x="30" y="4" width="12" height="20" rx="3" fill="#123"/>
             <rect x="48" y="3" width="4" height="6" fill="#fff6b0"/><rect x="48" y="19" width="4" height="6" fill="#fff6b0"/>
-            <rect x="40" y="25" width="6" height="4" fill="#ffb000"/>
+            <rect id="blinker" x="40" y="25" width="6" height="4" fill="#ffb000"/>
           </g>
 
           <!-- spotlight -->
-          <g class="beam">
+          <g class="beam" id="beam">
             <path d="M392 150 L408 150 L452 470 L348 470 Z" fill="url(#beamFill)"/>
           </g>
 
@@ -518,6 +479,127 @@ button { font: inherit; cursor: pointer; }
       navigator.clipboard.writeText(text).then(function () { note.textContent = "Copied a blurb to your clipboard."; }, fallback);
     } catch (err) { fallback(); }
   });
+})();
+</script>
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var scene = document.getElementById("scene");
+  var laneLeft = document.getElementById("lane-left");
+  var laneExit = document.getElementById("lane-exit");
+  var cutter = document.getElementById("cutter");
+  var blinker = document.getElementById("blinker");
+  var beam = document.getElementById("beam");
+  var COLORS = ["#b03a2e", "#e8e8e8", "#2f4e7a", "#9aa3ad", "#3d5c3a", "#1d1f22", "#c9b27a", "#7b2d26", "#5c6b7a", "#d9d4c7", "#8a96a3"];
+  var Y_LEFT = 300, Y_MID = 358, Y_EXIT = 410;
+  var V_LEFT = 150, V_EXIT = 28, V_CUT = 175;
+  var SPACING = 67, SLOTS = 14, GAP_EVERY = 5;
+
+  function makeCar(parent, color) {
+    var g = document.createElementNS(NS, "g");
+    g.innerHTML = '<rect width="52" height="28" rx="7"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/>' +
+      '<rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/>';
+    paint(g, color);
+    parent.appendChild(g);
+    return g;
+  }
+  function paint(g, color) { g.firstChild.setAttribute("fill", color); }
+  function place(g, x, y) { g.setAttribute("transform", "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ")"); }
+  function pick() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
+
+  // Left lane: moving at speed, uneven spacing.
+  var left = [];
+  var lx = -60;
+  for (var i = 0; i < 6; i++) { left.push({ x: lx, el: makeCar(laneLeft, pick()) }); lx += 120 + Math.random() * 90; }
+
+  // Exit lane: a crawling conveyor of slots; every few slots someone left a gap.
+  var exit = [];
+  for (var j = 0; j < SLOTS; j++) {
+    var slot = { x: -134 + j * SPACING, empty: j % GAP_EVERY === 2, el: makeCar(laneExit, pick()) };
+    slot.el.style.visibility = slot.empty ? "hidden" : "visible";
+    exit.push(slot);
+  }
+  var wrapCount = 0;
+
+  var state = "idle", target = null, cx = -200, cy = Y_MID, t0 = 0, mergeFrom = null;
+
+  function aimBeam() {
+    var dx = cx + 26 - 400, dy = cy + 14 - 150;
+    beam.setAttribute("transform", "rotate(" + (-Math.atan2(dx, dy) * 180 / Math.PI).toFixed(2) + " 400 150)");
+  }
+
+  function step(now, dt) {
+    left.forEach(function (c) {
+      c.x += V_LEFT * dt;
+      if (c.x > 820) { c.x -= 1000 + Math.random() * 80; paint(c.el, pick()); }
+      place(c.el, c.x, Y_LEFT);
+    });
+    exit.forEach(function (s) {
+      s.x += V_EXIT * dt;
+      if (s.x > 820) {
+        s.x -= SLOTS * SPACING;
+        wrapCount++;
+        s.empty = wrapCount % GAP_EVERY === 0;
+        paint(s.el, pick());
+        s.el.style.visibility = s.empty ? "hidden" : "visible";
+      }
+      place(s.el, s.x, Y_EXIT);
+    });
+
+    if (state === "idle") {
+      // Launch when a gap is far enough along that the cutter can catch it on screen.
+      for (var k = 0; k < exit.length; k++) {
+        var s = exit[k];
+        if (s.empty && s.x > 290 && s.x < 340) { target = s; state = "approach"; cx = -90; cy = Y_MID; break; }
+      }
+    } else if (state === "approach") {
+      cx += V_CUT * dt;
+      blinker.style.visibility = "hidden";
+      if (cx >= target.x - 45) { state = "merge"; t0 = now; mergeFrom = { x: cx, y: cy }; }
+    } else if (state === "merge") {
+      var p = Math.min(1, (now - t0) / 700), e = p * p * (3 - 2 * p);
+      blinker.style.visibility = Math.floor(now / 180) % 2 ? "visible" : "hidden";
+      cx = mergeFrom.x + (target.x - mergeFrom.x) * e;
+      cy = mergeFrom.y + (Y_EXIT - mergeFrom.y) * e;
+      if (p >= 1) { state = "shame"; t0 = now; target.empty = false; scene.classList.add("shaming"); }
+    } else if (state === "shame") {
+      blinker.style.visibility = "hidden";
+      cx = target.x; cy = Y_EXIT;
+      if (now - t0 > 3800) { state = "after"; t0 = now; scene.classList.remove("shaming"); }
+    } else if (state === "after") {
+      cx = target.x; cy = Y_EXIT;
+      if (now - t0 > 900) {
+        // The cutter becomes just another car in line.
+        paint(target.el, "#3fd0c9");
+        target.el.style.visibility = "visible";
+        cx = -200; state = "idle";
+      }
+    }
+    place(cutter, cx, cy);
+    aimBeam();
+  }
+
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Still frame: the moment of shame.
+    step(0, 0);
+    var gap = exit.filter(function (s) { return s.empty && s.x > 300; })[0] || exit[9];
+    gap.empty = false; cx = gap.x; cy = Y_EXIT;
+    place(cutter, cx, cy); aimBeam();
+    scene.classList.add("shaming");
+    return;
+  }
+
+  // Fast-forward so the first frame already has a cutter on the way.
+  var last = null;
+  for (var w = 0; w < 400 && state === "idle"; w++) step(w * 50, 0.05);
+  function frame(now) {
+    if (last === null) last = now;
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    step(now, dt);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
