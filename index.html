@@ -98,7 +98,16 @@ button { font: inherit; cursor: pointer; }
 
 /* Pledge card */
 .card { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: 0 6px 24px rgba(10, 30, 20, 0.08); display: grid; gap: 16px; }
-@media (max-width: 900px) { .card { position: static; } }
+.pledge { display: grid; gap: 16px; }
+/* Phones: amount raised and Donate sit right under the cartoon; recent donations move to the bottom. */
+@media (max-width: 900px) {
+  .grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .main-col, .card { display: contents; }
+  .hero { order: 1; }
+  .pledge { order: 2; margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .main-col > :not(.hero) { order: 3; }
+  .donors { order: 4; padding-block: 28px 0; }
+}
 .raised { font-family: var(--font-display); font-size: 30px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
 .raised-of { color: var(--muted); font-size: 15px; margin-top: 6px; }
 .bar { height: 10px; border-radius: 99px; background: var(--track); overflow: hidden; }
@@ -342,6 +351,7 @@ button { font: inherit; cursor: pointer; }
     </div>
 
     <aside class="card" aria-label="Donate">
+      <div class="pledge">
       <div>
         <div class="raised" id="raised">$3,217</div>
         <div class="raised-of">raised of $41,800 goal</div>
@@ -351,6 +361,7 @@ button { font: inherit; cursor: pointer; }
       <button class="btn btn-primary" id="open-donate" type="button">Donate</button>
       <button class="btn btn-ghost" id="share" type="button">Share</button>
       <div class="share-note" id="share-note" aria-live="polite"></div>
+      </div>
 
       <div class="donors">
         <h3>Recent donations</h3>
