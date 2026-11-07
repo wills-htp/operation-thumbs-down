@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Help me hover a helicopter over the 290/495 interchange and give line-cutters a giant thumbs down.">
+<meta property="og:title" content="Operation Thumbs Down">
+<meta property="og:description" content="Help me hover a helicopter over the 290/495 interchange and give line-cutters a giant thumbs down.">
+<meta property="og:type" content="website">
+<title>Operation Thumbs Down</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@500;700;800;900&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: crowdfunding campaign — story column on the left, sticky pledge card on the right; stacks on phones.
+   Palette borrows from interstate signage: MUTCD sign green, exit-only yellow, brake-light red. */
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --ink: #17201b;
+  --muted: #5d6a62;
+  --line: #dde3dd;
+  --sign: #0b6b3a;
+  --sign-ink: #ffffff;
+  --exit: #f5c400;
+  --brake: #c8281e;
+  --track: #e4e9e4;
+  --font-display: "Overpass", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101512; --surface: #18201b; --ink: #e8eee9; --muted: #9aa8a0; --line: #2a352e;
+    --sign: #1f8a4f; --sign-ink: #ffffff; --exit: #f5c400; --brake: #ef5a4f; --track: #26302a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101512; --surface: #18201b; --ink: #e8eee9; --muted: #9aa8a0; --line: #2a352e;
+  --sign: #1f8a4f; --sign-ink: #ffffff; --exit: #f5c400; --brake: #ef5a4f; --track: #26302a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--font-body); }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: var(--sign); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; text-wrap: balance; margin: 0; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--exit); outline-offset: 2px; }
+
+.topbar { border-bottom: 1px solid var(--line); background: var(--surface); }
+.topbar-inner { max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wordmark { font-family: var(--font-display); font-weight: 900; font-size: 22px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+.wordmark .hat { width: 28px; height: 28px; }
+.topbar nav { display: flex; gap: 20px; font-size: 14px; color: var(--muted); }
+@media (max-width: 560px) { .topbar nav { display: none; } }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+.page-title { font-size: clamp(30px, 4.6vw, 46px); font-weight: 900; letter-spacing: -0.015em; margin-bottom: 20px; max-width: 22ch; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+
+.hero { border-radius: 14px; overflow: hidden; background: #22305a; aspect-ratio: 16 / 9; max-width: 100%; }
+.hero svg { display: block; width: 100%; height: 100%; }
+
+.organizer { display: flex; align-items: center; gap: 12px; padding-block: 18px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--sign); color: var(--sign-ink); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; flex: none; }
+.tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+.section { padding-block: 28px; border-bottom: 1px solid var(--line); }
+.section h2 { font-size: 24px; font-weight: 800; margin-bottom: 14px; }
+.story p { max-width: 65ch; margin: 0 0 14px; }
+.story p:last-child { margin-bottom: 0; }
+.pull { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.25; border-left: 6px solid var(--exit); padding-left: 16px; margin: 22px 0; max-width: 32ch; }
+
+.budget { width: 100%; border-collapse: collapse; font-size: 15px; }
+.budget td { padding: 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.budget td:last-child { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; padding-left: 16px; }
+.budget small { display: block; color: var(--muted); font-size: 13px; }
+.budget tr.total td { border-bottom: 0; font-weight: 800; font-family: var(--font-display); font-size: 18px; }
+
+.updates { display: grid; gap: 18px; }
+.update { display: grid; gap: 4px; }
+.update h3 { font-size: 17px; font-weight: 800; }
+.update p { margin: 0; max-width: 65ch; }
+
+.faq { display: grid; gap: 0; }
+.faq details { border-bottom: 1px solid var(--line); padding-block: 14px; }
+.faq details:last-child { border-bottom: 0; }
+.faq summary { font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-display); font-weight: 800; color: var(--sign); }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { margin: 8px 0 0; max-width: 65ch; color: var(--muted); }
+
+/* Pledge card */
+.card { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: 0 6px 24px rgba(10, 30, 20, 0.08); display: grid; gap: 16px; }
+@media (max-width: 900px) { .card { position: static; } }
+.raised { font-family: var(--font-display); font-size: 30px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+.raised-of { color: var(--muted); font-size: 15px; margin-top: 6px; }
+.bar { height: 10px; border-radius: 99px; background: var(--track); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--sign); border-radius: 99px; transition: width 600ms ease; }
+.stats { display: flex; gap: 18px; font-size: 14px; color: var(--muted); }
+.stats b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.btn { border: 0; border-radius: 10px; padding: 14px 18px; font-weight: 700; font-size: 16px; width: 100%; }
+.btn-primary { background: var(--exit); color: #17201b; font-family: var(--font-display); font-weight: 900; font-size: 18px; letter-spacing: 0.02em; text-transform: uppercase; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--track); }
+.share-note { font-size: 13px; color: var(--muted); text-align: center; min-height: 1.3em; margin-top: -8px; }
+
+.donors h3 { font-size: 15px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.donor-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.donor-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding-block: 10px; border-top: 1px solid var(--line); font-size: 14px; }
+.donor-list .dot { width: 36px; height: 36px; border-radius: 50%; background: var(--track); display: grid; place-items: center; color: var(--brake); }
+.donor-list .dot svg { width: 18px; height: 18px; }
+.donor-list .who { font-weight: 700; }
+.donor-list .amt { font-variant-numeric: tabular-nums; }
+.donor-list q { display: block; color: var(--muted); font-style: italic; quotes: "“" "”"; }
+.donor-list li.new { animation: flash 1.4s ease; }
+@keyframes flash { from { background: color-mix(in srgb, var(--exit) 35%, transparent); } to { background: transparent; } }
+
+/* Pledge dialog */
+.overlay { position: fixed; inset: 0; background: rgba(8, 14, 10, 0.55); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.dialog { background: var(--surface); color: var(--ink); border-radius: 14px; width: min(460px, 100%); max-height: 100%; overflow: auto; padding: 24px; display: grid; gap: 16px; }
+.dialog h2 { font-size: 24px; font-weight: 900; }
+.dialog p { margin: 0; color: var(--muted); }
+.amounts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.amounts button { border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 12px 0; font-family: var(--font-display); font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums; }
+.amounts button[aria-pressed="true"] { border-color: var(--sign); background: color-mix(in srgb, var(--sign) 12%, var(--bg)); }
+.field { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.field input, .field textarea { font: inherit; font-weight: 400; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; }
+.field textarea { resize: vertical; min-height: 70px; }
+.fine { font-size: 12px; color: var(--muted); }
+.dialog-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.thanks { text-align: center; display: grid; gap: 12px; justify-items: center; }
+.thanks svg { width: 72px; height: 72px; }
+
+/* Hero animation */
+.rotor { transform-box: fill-box; transform-origin: center; animation: spin 0.18s linear infinite; }
+@keyframes spin { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.12); } }
+.heli { animation: hover 3.2s ease-in-out infinite; }
+@keyframes hover { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(0, 6px); } }
+.glove { animation: pump 0.9s ease-in-out infinite; }
+@keyframes pump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(26px); } }
+.cable { animation: cable 0.9s ease-in-out infinite; }
+@keyframes cable { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.37); } }
+.cutter { animation: cut 9s ease-in-out infinite; }
+@keyframes cut {
+  0% { transform: translate(-90px, 303px); }
+  50% { transform: translate(470px, 303px); }
+  62% { transform: translate(535px, 413px); }
+  100% { transform: translate(535px, 413px); }
+}
+.beam { transform-box: view-box; transform-origin: 400px 150px; animation: beam 9s ease-in-out infinite; }
+@keyframes beam {
+  0%, 52% { opacity: 0; transform: rotate(-12deg); }
+  58% { opacity: 1; transform: rotate(-22deg); }
+  64%, 94% { opacity: 1; transform: rotate(-28.5deg); }
+  100% { opacity: 0; transform: rotate(-28.5deg); }
+}
+.deploy { animation: deploy 9s ease-in-out infinite; }
+@keyframes deploy {
+  0%, 60% { opacity: 0; transform: translateY(-70px); }
+  61% { opacity: 1; transform: translateY(-70px); }
+  67%, 92% { opacity: 1; transform: translateY(0); }
+  97% { opacity: 1; transform: translateY(-70px); }
+  98%, 100% { opacity: 0; transform: translateY(-70px); }
+}
+.shout { animation: shout 9s steps(1) infinite; }
+@keyframes shout { 0%, 63% { opacity: 0; } 64%, 95% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .rotor, .heli, .glove, .cable { animation: none; }
+  .cutter { animation: none; transform: translate(535px, 413px); }
+  .beam { animation: none; opacity: 1; transform: rotate(-28.5deg); }
+  .shout { animation: none; opacity: 1; }
+  .deploy { animation: none; }
+  .bar span { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="wordmark">
+      <svg class="hat" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 21c0-7 4-13 10-13s10 6 10 13" fill="var(--sign)"/><rect x="2" y="20" width="28" height="5" rx="2.5" fill="var(--ink)"/></svg>
+      passthehat
+    </div>
+    <nav aria-label="Site"><span>Discover</span><span>Start a hat</span><span>Sign in</span></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 class="page-title">Help me hover over 290/495 and give line-cutters a giant thumbs down</h1>
+
+  <div class="grid">
+    <div class="main-col">
+      <div class="hero" role="img" aria-label="Cartoon: a helicopter at dusk hovers over a highway. A car speeds up the empty left lane and cuts into the stopped exit-only queue for 495 South. A spotlight snaps onto it and a giant white glove hanging from the helicopter pumps a thumbs down.">
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1e2a55"/>
+              <stop offset="0.55" stop-color="#7a4a78"/>
+              <stop offset="1" stop-color="#f19a5b"/>
+            </linearGradient>
+            <linearGradient id="beamFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fffbe0" stop-opacity="0.95"/>
+              <stop offset="1" stop-color="#fff3a8" stop-opacity="0.35"/>
+            </linearGradient>
+          </defs>
+
+          <rect width="800" height="280" fill="url(#sky)"/>
+          <!-- treeline -->
+          <path d="M0 282 L0 252 Q20 236 38 250 Q55 228 76 248 Q96 230 118 250 Q140 226 162 248 Q186 232 206 252 Q230 230 252 250 Q274 236 296 252 Q322 228 346 250 Q370 236 392 252 Q418 230 440 250 Q462 234 486 252 Q510 228 534 250 Q556 236 578 252 Q602 230 626 250 Q650 234 672 252 Q696 228 720 250 Q744 236 766 252 Q784 240 800 250 L800 282 Z" fill="#1c3326"/>
+
+          <!-- road -->
+          <rect y="280" width="800" height="170" fill="#3a3f44"/>
+          <rect y="284" width="800" height="3" fill="#e9e3c9"/>
+          <g fill="#f2f2f2">
+            <rect x="0" y="342" width="40" height="3"/><rect x="80" y="342" width="40" height="3"/><rect x="160" y="342" width="40" height="3"/><rect x="240" y="342" width="40" height="3"/><rect x="320" y="342" width="40" height="3"/><rect x="400" y="342" width="40" height="3"/><rect x="480" y="342" width="40" height="3"/><rect x="560" y="342" width="40" height="3"/><rect x="640" y="342" width="40" height="3"/><rect x="720" y="342" width="40" height="3"/>
+          </g>
+          <!-- solid exit-lane line -->
+          <rect y="394" width="800" height="5" fill="#f2f2f2"/>
+          <rect y="445" width="800" height="3" fill="#f2f2f2"/>
+
+          <!-- middle-lane traffic, also stopped -->
+          <g>
+            <g transform="translate(60 356)"><rect width="52" height="28" rx="7" fill="#8a96a3"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(250 356)"><rect width="52" height="28" rx="7" fill="#d9d4c7"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(640 356)"><rect width="52" height="28" rx="7" fill="#5c6b7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+          </g>
+
+          <!-- exit-only queue: the honest people -->
+          <g>
+            <g transform="translate(15 408)"><rect width="52" height="28" rx="7" fill="#b03a2e"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(82 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(149 408)"><rect width="52" height="28" rx="7" fill="#2f4e7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(216 408)"><rect width="52" height="28" rx="7" fill="#9aa3ad"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(283 408)"><rect width="52" height="28" rx="7" fill="#3d5c3a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(350 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(417 408)"><rect width="52" height="28" rx="7" fill="#1d1f22"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#4a535c"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(484 408)"><rect width="52" height="28" rx="7" fill="#c9b27a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(605 408)"><rect width="52" height="28" rx="7" fill="#7b2d26"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(672 408)"><rect width="52" height="28" rx="7" fill="#e8e8e8"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+            <g transform="translate(739 408)"><rect width="52" height="28" rx="7" fill="#2f4e7a"/><rect x="30" y="4" width="12" height="20" rx="3" fill="#2a3138"/><rect x="0" y="3" width="4" height="7" fill="#ff3b30"/><rect x="0" y="18" width="4" height="7" fill="#ff3b30"/></g>
+          </g>
+
+          <!-- overhead sign -->
+          <g>
+            <rect x="618" y="196" width="6" height="90" fill="#6b7178"/>
+            <rect x="770" y="196" width="6" height="90" fill="#6b7178"/>
+            <rect x="604" y="112" width="186" height="100" rx="8" fill="#0b6b3a" stroke="#ffffff" stroke-width="3"/>
+            <path d="M622 128 h36 v6 q0 22 -18 30 q-18 -8 -18 -30 Z" fill="#1d4f9e" stroke="#ffffff" stroke-width="2"/>
+            <path d="M622 128 h36 v8 h-36 Z" fill="#c8281e"/>
+            <text x="640" y="155" text-anchor="middle" font-family="Overpass, Arial, sans-serif" font-weight="800" font-size="13" fill="#ffffff">495</text>
+            <text x="668" y="160" font-family="Overpass, Arial, sans-serif" font-weight="900" font-size="26" fill="#ffffff">SOUTH</text>
+            <rect x="606" y="180" width="182" height="30" rx="0" fill="#f5c400"/>
+            <path d="M606 180 h182 v22 q0 8 -8 8 h-166 q-8 0 -8 -8 Z" fill="#f5c400"/>
+            <text x="697" y="201" text-anchor="middle" font-family="Overpass, Arial, sans-serif" font-weight="900" font-size="17" letter-spacing="1" fill="#111111">EXIT ONLY</text>
+          </g>
+
+          <!-- the cutter -->
+          <g class="cutter">
+            <rect width="52" height="28" rx="7" fill="#3fd0c9"/>
+            <rect x="30" y="4" width="12" height="20" rx="3" fill="#123"/>
+            <rect x="48" y="3" width="4" height="6" fill="#fff6b0"/><rect x="48" y="19" width="4" height="6" fill="#fff6b0"/>
+            <rect x="40" y="25" width="6" height="4" fill="#ffb000"/>
+          </g>
+
+          <!-- spotlight -->
+          <g class="beam">
+            <path d="M392 150 L408 150 L452 470 L348 470 Z" fill="url(#beamFill)"/>
+          </g>
+
+          <!-- loudspeaker callout -->
+          <g class="shout">
+            <rect x="100" y="64" width="244" height="40" rx="8" fill="#ffffff"/>
+            <path d="M320 104 L344 118 L306 104 Z" fill="#ffffff"/>
+            <text x="222" y="91" text-anchor="middle" font-family="Overpass, Arial, sans-serif" font-weight="900" font-size="20" fill="#c8281e">We live in a society!</text>
+          </g>
+
+          <!-- helicopter + glove -->
+          <g class="heli">
+            <g transform="translate(400 120)">
+              <rect x="-3" y="-40" width="6" height="12" fill="#2b2f33"/>
+              <rect class="rotor" x="-110" y="-44" width="220" height="5" rx="2.5" fill="#15181b"/>
+              <rect x="30" y="-8" width="96" height="9" rx="4" fill="#d8352a"/>
+              <path d="M118 -24 l10 0 l6 24 l-12 0 Z" fill="#d8352a"/>
+              <circle cx="128" cy="-6" r="12" fill="none" stroke="#15181b" stroke-width="2" opacity="0.6"/>
+              <ellipse cx="0" cy="0" rx="50" ry="29" fill="#d8352a"/>
+              <path d="M-44 -6 Q-40 -26 -8 -26 L-8 4 L-46 4 Z" fill="#9fd3e8"/>
+              <rect x="-2" y="-14" width="22" height="22" rx="3" fill="#9fd3e8"/>
+              <rect x="-28" y="34" width="4" height="10" fill="#2b2f33"/><rect x="22" y="34" width="4" height="10" fill="#2b2f33"/>
+              <rect x="-46" y="42" width="84" height="4" rx="2" fill="#2b2f33"/>
+              <!-- searchlight housing -->
+              <rect x="-12" y="24" width="24" height="12" rx="4" fill="#2b2f33"/>
+              <circle cx="0" cy="34" r="5" fill="#fff6b0"/>
+            </g>
+            <!-- cable and glove hang from the open door -->
+            <g transform="translate(436 140)">
+             <g class="deploy">
+              <rect class="cable" x="-1.5" y="0" width="3" height="70" fill="#15181b" style="transform-box: fill-box; transform-origin: top;"/>
+              <g class="glove" transform-origin="0 0">
+                <g transform="translate(0 70)">
+                  <!-- foam-finger hand, drawn thumbs-up then flipped so the thumb points down -->
+                  <g transform="translate(-35 74) scale(0.62 -0.62)" stroke="#15181b" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M30 120 L86 120 Q97 96 95 72 Q94 58 90 52 L90 14 Q90 0 73 0 Q56 0 56 14 L56 42 L14 42 Q2 42 2 54 Q2 59 6 62 Q0 68 4 76 Q0 83 4 90 Q0 97 6 102 Q10 112 30 112 Z" fill="#ffffff" stroke-width="5"/>
+                    <path d="M7 62 Q32 67 58 62 M5 76 Q32 81 60 76 M5 90 Q32 95 62 90 M10 103 Q32 107 64 103" fill="none" stroke-width="4"/>
+                    <path d="M56 42 Q66 54 62 66 Q68 80 64 104" fill="none" stroke-width="4"/>
+                    <path d="M34 112 L86 112" fill="none" stroke-width="3.5"/>
+                  </g>
+                </g>
+              </g>
+             </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="organizer">
+        <div class="avatar" aria-hidden="true">W</div>
+        <div><strong>Will S.</strong> is organizing this hat<br><span class="tag">Hudson / Marlborough, MA · Created Nov 7</span></div>
+      </div>
+
+      <section class="section story" aria-labelledby="story-h">
+        <h2 id="story-h">The story</h2>
+        <p>Every weekday from about 4:15 to 6:30, the exit-only lane from 290 East onto 495 South backs up for a mile. Hundreds of people sit in it. They signaled early. They merged politely. They are listening to the same traffic report for the third time.</p>
+        <p>Then someone comes flying up the empty left lane. It is almost always an expensive car. And among the expensive cars, it is almost always an Audi. He puts his blinker on at the very last second and noses in at the gore point like he's surprised the exit exists. Somebody lets him in, because people around here are better than they get credit for. He has never once been held accountable.</p>
+        <p class="pull">I want to rent a helicopter, hover over the interchange, and hold him accountable.</p>
+        <p>Here is the plan. I hover at a legal and respectful altitude over the split. When someone skips the line, my spotter calls it. I hit them with a searchlight. Then a nine-foot white glove, hanging from a cable out the side door, lowers into view and pumps a slow, disapproving thumbs down. Up. Down. Up. Down. Until they think about what they did.</p>
+        <p>No yelling and no license plates posted online. Just a big hand in the sky telling them we saw it.</p>
+        <p>The money below covers four weeks of rush hours. Anything over the goal goes to a second glove, for the 128/93 split in Woburn.</p>
+      </section>
+
+      <section class="section" aria-labelledby="budget-h">
+        <h2 id="budget-h">Where the money goes</h2>
+        <table class="budget">
+          <tbody>
+            <tr><td>Helicopter rental with pilot<small>4-seat piston helicopter, 2 hrs × 20 weekday rush hours, at $650/hr</small></td><td>$26,000</td></tr>
+            <tr><td>Searchlight rental<small>30-million-candela, mounted under the nose. Aimed at the roof, never the windshield.</small></td><td>$6,500</td></tr>
+            <tr><td>Insurance<small>The first three brokers laughed. The fourth asked for a deposit.</small></td><td>$4,000</td></tr>
+            <tr><td>Giant glove, custom fabricated<small>9 ft, white, fire-retardant foam, with cuff</small></td><td>$2,400</td></tr>
+            <tr><td>Winch and actuator for the up-and-down<small>Variable speed, from "mild disappointment" to "I'm not mad, I'm just disappointed"</small></td><td>$1,900</td></tr>
+            <tr><td>Fuel surcharge and Dunkin' for the pilot</td><td>$1,000</td></tr>
+            <tr class="total"><td>Total</td><td>$41,800</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" aria-labelledby="updates-h">
+        <h2 id="updates-h">Updates</h2>
+        <div class="updates">
+          <article class="update">
+            <span class="tag">Update 2 · Nov 6</span>
+            <h3>Glove prototype complete</h3>
+            <p>It is a regular garden glove for now. I held it out the car window on the Route 85 overpass to check the visibility. You can see it fine. A man in a Silverado gave it a thumbs up back, which I'm counting as market validation.</p>
+          </article>
+          <article class="update">
+            <span class="tag">Update 1 · Nov 3</span>
+            <h3>Called three helicopter companies</h3>
+            <p>One hung up. One asked if this was for a TV show. The third said, "What day?" We are going with the third.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="faq-h" style="border-bottom:0">
+        <h2 id="faq-h">Questions</h2>
+        <div class="faq">
+          <details><summary>Is this legal?</summary><p>Hovering is legal. Pointing is legal. Disapproval is protected speech. We are looking into the rest and will get back to you.</p></details>
+          <details><summary>Won't the light distract drivers?</summary><p>The beam goes on the roof of the car, the way a stage light finds an actor who forgot his lines. Everyone in the queue is already stopped, so they have time to enjoy it.</p></details>
+          <details><summary>What counts as skipping the line?</summary><p>Passing more than 20 cars in the left lane and then merging into the exit-only lane inside the last quarter mile. Merging early and honestly is fine. Being from out of state gets you one warning.</p></details>
+          <details><summary>Why a hand and not a sign?</summary><p>People ignore signs. There are already four of them. Nobody ignores a nine-foot glove coming down out of the sky.</p></details>
+          <details><summary>I'm one of the people who cuts. Can I still donate?</summary><p>Yes. Think of it as an offset.</p></details>
+          <details><summary>What if you don't hit the goal?</summary><p>Plan B is a very tall ladder and a regular-sized glove.</p></details>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card" aria-label="Donate">
+      <div>
+        <div class="raised" id="raised">$3,217</div>
+        <div class="raised-of">raised of $41,800 goal</div>
+      </div>
+      <div class="bar" role="progressbar" aria-label="Funding progress" aria-valuemin="0" aria-valuemax="41800" aria-valuenow="3217" id="bar"><span id="bar-fill" style="width: 7.7%"></span></div>
+      <div class="stats"><span><b id="count">87</b> donations</span><span><b>23</b> days left</span></div>
+      <button class="btn btn-primary" id="open-donate" type="button">Donate</button>
+      <button class="btn btn-ghost" id="share" type="button">Share</button>
+      <div class="share-note" id="share-note" aria-live="polite"></div>
+
+      <div class="donors">
+        <h3>Recent donations</h3>
+        <ul class="donor-list" id="donors"></ul>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+    <form id="donate-form">
+      <div style="display:grid;gap:16px">
+        <h2 id="dlg-title">Chip in for the glove</h2>
+        <p>Pick an amount. Leave a message for the helicopter.</p>
+        <div class="amounts" role="group" aria-label="Amount">
+          <button type="button" data-amt="10" aria-pressed="false">$10</button>
+          <button type="button" data-amt="25" aria-pressed="true">$25</button>
+          <button type="button" data-amt="50" aria-pressed="false">$50</button>
+          <button type="button" data-amt="100" aria-pressed="false">$100</button>
+        </div>
+        <label class="field" for="d-name">Name on the donor list
+          <input id="d-name" type="text" maxlength="40" placeholder="Anonymous">
+        </label>
+        <label class="field" for="d-msg">Message
+          <textarea id="d-msg" maxlength="140" placeholder="The white Tacoma. Every day. You know who you are."></textarea>
+        </label>
+        <p class="fine">This is a joke. Nothing is charged and nothing leaves your browser.</p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" id="cancel">Cancel</button>
+          <button class="btn btn-primary" type="submit">Donate $25</button>
+        </div>
+      </div>
+    </form>
+    <div class="thanks" id="thanks" hidden>
+      <svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="var(--sign)"/><path d="M22 37 l9 9 l19 -20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2>Your disapproval has been logged</h2>
+      <p>No money changed hands. Your name is on the list until you close this tab.</p>
+      <button class="btn btn-primary" type="button" id="done">Back to the campaign</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var GOAL = 41800;
+  var raised = 3217;
+  var count = 87;
+  var amount = 25;
+
+  var thumb = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 21c1 0 1.6-.8 1.6-1.8V15h5.2c1.2 0 2.1-1.1 1.9-2.3l-1-6.4C17.5 5 16.6 4 15.4 4H8v10.4l1.4 5.3c.1.7.4 1.3.6 1.3zM3 4h3v10H3z" fill="currentColor"/></svg>';
+
+  var seed = [
+    ["Anonymous", 25, "I sit in that line every day. Every. Day."],
+    ["Deb from Shrewsbury", 50, "The white Tacoma. You know who you are."],
+    ["Kevin M.", 5, "I am one of the people who cuts. I deserve this."],
+    ["Commuters Who Signal Early", 100, "Finally, representation."],
+    ["Paula R.", 20, "Can the glove also do 128 by the Burlington Mall?"],
+    ["A guy from Worcester", 10, "We're the ones in the line. Get 'em."]
+  ];
+
+  var list = document.getElementById("donors");
+  function money(n) { return "$" + n.toLocaleString("en-US"); }
+  function addDonor(name, amt, msg, isNew) {
+    var li = document.createElement("li");
+    if (isNew) li.className = "new";
+    var dot = document.createElement("div"); dot.className = "dot"; dot.innerHTML = thumb;
+    var body = document.createElement("div");
+    var who = document.createElement("span"); who.className = "who"; who.textContent = name;
+    var amtEl = document.createElement("span"); amtEl.className = "amt"; amtEl.textContent = " · " + money(amt);
+    body.appendChild(who); body.appendChild(amtEl);
+    if (msg) { var q = document.createElement("q"); q.textContent = msg; body.appendChild(q); }
+    li.appendChild(dot); li.appendChild(body);
+    list.insertBefore(li, isNew ? list.firstChild : null);
+  }
+  seed.forEach(function (d) { addDonor(d[0], d[1], d[2], false); });
+
+  function render() {
+    document.getElementById("raised").textContent = money(raised);
+    document.getElementById("count").textContent = count;
+    document.getElementById("bar").setAttribute("aria-valuenow", raised);
+    document.getElementById("bar-fill").style.width = Math.min(100, raised / GOAL * 100).toFixed(1) + "%";
+  }
+
+  var overlay = document.getElementById("overlay");
+  var form = document.getElementById("donate-form");
+  var thanks = document.getElementById("thanks");
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var amtBtns = form.querySelectorAll(".amounts button");
+
+  function open() { form.hidden = false; thanks.hidden = true; overlay.hidden = false; amtBtns[1].focus(); }
+  function close() { overlay.hidden = true; document.getElementById("open-donate").focus(); }
+
+  document.getElementById("open-donate").addEventListener("click", open);
+  document.getElementById("cancel").addEventListener("click", close);
+  document.getElementById("done").addEventListener("click", close);
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !overlay.hidden) close(); });
+
+  amtBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      amtBtns.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+      b.setAttribute("aria-pressed", "true");
+      amount = Number(b.dataset.amt);
+      submitBtn.textContent = "Donate $" + amount;
+    });
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = document.getElementById("d-name").value.trim() || "Anonymous";
+    var msg = document.getElementById("d-msg").value.trim();
+    raised += amount; count += 1;
+    addDonor(name, amount, msg, true);
+    render();
+    form.reset();
+    form.hidden = true; thanks.hidden = false;
+    document.getElementById("done").focus();
+  });
+
+  document.getElementById("share").addEventListener("click", function () {
+    var note = document.getElementById("share-note");
+    var text = "Help Will hover a helicopter over 290/495 and give line-cutters a giant thumbs down.";
+    function fallback() { note.textContent = text; }
+    try {
+      navigator.clipboard.writeText(text).then(function () { note.textContent = "Copied a blurb to your clipboard."; }, fallback);
+    } catch (err) { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
